@@ -10,79 +10,113 @@
 //================================================================
 #include "xDomain.h"
 
-
-SUBDOMAIN::SUBDOMAIN()
+Domain::Domain()
 {
 
 }
 
-SUBDOMAIN::SUBDOMAIN(std::string sub_domain_name)
+// 初始化并设置名称
+Domain::Domain(const string& domain_name)
 {
-    _name = sub_domain_name;
+    _name = domain_name; 
 }
 
-SUBDOMAIN::~SUBDOMAIN()
+Domain::~Domain()
 {
-    
+
 }
 
-void SUBDOMAIN::show()
-{
-    for(std::vector<std::string>::const_iterator iter = _addr_list.begin(); iter != _addr_list.end(); ++iter)
-    {
-        std::cout << *iter<< std::endl;
-    }
-}
-
-const std::string& SUBDOMAIN::get_name()
+const string& Domain::name()
 {
     return _name;
 }
 
-DOMAIN::DOMAIN()
+// 解析当前域的子域名
+int Domain::resolve()
 {
+    struct hostent *host;
+    s32 iCnt = 0;
 
+    if(_sub_list.empty())
+    {
+        return 0;
+    }
+
+    res_init();
+    
+    for(auto map_iter = _sub_list.begin(); map_iter != _sub_list.end(); ++map_iter)
+    {
+        printf("Resolve---->SUBDOMAIN:[%s] =>",map_iter->first.c_str());
+        host = gethostbyname(map_iter->first.c_str());
+        if(NULL == host)
+        {
+            continue;
+        }
+        else
+        {
+            s8 **n_addr;
+            u32 ip;
+            for(n_addr = host->h_addr_list; *n_addr; n_addr++)
+            {
+                ip = *((u32 *)(*n_addr));
+                if(ip)
+                {
+                    char addr[18] = {0};
+                    inet_ntop(AF_INET, &ip, addr, sizeof(addr));
+                    printf("[%s]",addr);
+                    iCnt++;
+                    map_iter->second.emplace_back(string(addr));
+                }
+            }
+        }
+        printf("\n");
+    }
+    return iCnt;
 }
 
-DOMAIN::DOMAIN(std::string domain_name)
+// 添加子域名
+int Domain::add_sub(const string& sub_domain_name)
 {
-    _template_domain = domain_name; 
-}
+    //LIST::iterator iter;
 
-DOMAIN::~DOMAIN()
-{
-
-}
-
-int DOMAIN::add(std::string sub_domain_name)
-{
-    SUBDOMAIN sub_domain(sub_domain_name);
-    _sub_domain_list.emplace_back(sub_domain);
-    printf("====[%s] add [%s]\n",_template_domain.c_str(), sub_domain_name.c_str());
+    auto search = _sub_list.find(sub_domain_name);
+    if(search == _sub_list.end())    // not found
+    {
+        ADDR_LIST addr_list;
+        _sub_list.emplace(make_pair(sub_domain_name,addr_list));
+    }
+    
     return 0;
 }
 
-void DOMAIN::show()
+// 
+void Domain::show()
 {
-    printf("DOMAIN:[%s]\n",_template_domain.c_str());
-    for(SUBDOMAIN_LIST::iterator iter = _sub_domain_list.begin(); iter != _sub_domain_list.end(); ++iter)
+    printf("DOMAIN:[%s]\n",_name.c_str());
+    for(auto map_iter = _sub_list.begin(); map_iter != _sub_list.end(); ++map_iter)
     {
-        printf("    SUBDOMAIN:[%s]\n",iter->get_name().c_str());
-        iter->show();
+        printf("---->SUBDOMAIN:[%s]\n",map_iter->first.c_str());
+
+        for(auto vec_iter = map_iter->second.begin(); vec_iter != map_iter->second.end(); ++vec_iter)
+        {
+            printf("-------->ADDR:[%s]\n",(*vec_iter).c_str());
+        }
     }
 }
 
-int DOMAIN::test(std::string name)
+// 使用三级(+)域名尝试匹配二级域名, 匹配成功则加入该二级域名的子域名列表
+int Domain::try_match(const string& name)
 {
-    std::string::size_type idx;
-    idx = name.find(_template_domain);
-    if(idx == std::string::npos)
+    string::size_type idx;
+    idx = name.find(_name);
+    if(idx == string::npos)
     {
         // not find
     }
     else
     {
-        add(name);
+        name.erase(0,1);    // 去除起始位置'.'
+        add_sub(name);
     }
     
 }

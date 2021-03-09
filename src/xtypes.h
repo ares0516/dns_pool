@@ -13,6 +13,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 #include <arpa/inet.h>
 
 typedef char            s8;

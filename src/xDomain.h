@@ -15,37 +15,29 @@
 #include <pthread.h>
 #include <pcap.h>
 #include <iostream>
+#include <map>
+#include <vector>
+#include <resolv.h>
+#include <netdb.h>
 
-class SUBDOMAIN
-{
-private:
-    std::vector<std::string> _addr_list;
-    std::string _name;
-public:
-    SUBDOMAIN();
-    SUBDOMAIN(std::string subdomain_name);
-    ~SUBDOMAIN();
-    int add(std::string);
-    int flush();
-    int update(std::vector<std::string>);
-    void show();
-    const std::string& get_name();
-};
+using namespace std;
 
-class DOMAIN
+class Domain
 {
-    typedef std::vector<SUBDOMAIN> SUBDOMAIN_LIST;
+typedef map<string,vector<string>> LIST;
+typedef vector<string> ADDR_LIST;
 private:
-    std::string _template_domain;
-    SUBDOMAIN_LIST _sub_domain_list;
+    string _name;   // 域名
+    LIST _sub_list; // 子域名列表
 public:
-    DOMAIN();
-    DOMAIN(std::string domain_name);
-    ~DOMAIN();
-    int add(std::string sub_domain_name);
-    int flush();
-    int test(std::string);
+    Domain();
+    Domain(const string& domain_name);
+    ~Domain();
+    int add_sub(const string& sub_domain_name);
+    int try_match(const string&);
     void show();
+    int resolve();
+    const string& name();
 };
 
 #endif

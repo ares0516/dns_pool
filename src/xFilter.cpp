@@ -24,14 +24,25 @@ FILTER::~FILTER()
 
 }
 
-int pcap_analysis_func()
+// 域名解析线程
+void* FILTER::_resolve_func(void* args)
 {
+    FILTER *pf = (FILTER*)args;
 
-    return 0;
+    while(1)
+    {
+        for(DOMAIN_LIST::iterator iter = pf->_domain_match_list.begin(); iter != pf->_domain_match_list.end(); ++iter)
+        {
+            //printf("resolve domain=>[%s]\n",iter->name().c_str());
+            iter->resolve();
+        }
+        sleep(5);
+    }
+
 }
 
-
-void FILTER::_pkt_handler_func(pcap_t *args, struct pcap_pkthdr *pCapHeader, const u8 *pData)
+// 数据包解析函数，用于pcap_loop回调时处理数据包
+void FILTER::_pkt_handler_callback_func(pcap_t *args, struct pcap_pkthdr *pCapHeader, const u8 *pData)
 {
     FILTER *pf = (FILTER*)args;
 
@@ -124,7 +135,7 @@ void FILTER::_pkt_handler_func(pcap_t *args, struct pcap_pkthdr *pCapHeader, con
             //     // std::cout<<"A : "<< srt11 <<std::endl;
                 std::string tmp_domain((char *)domain);
 
-                pf->subdomain_add(tmp_domain);
+                pf->add_sub_domain(tmp_domain);
             }
         }
         //printf("`````1```\n");
@@ -132,7 +143,8 @@ void FILTER::_pkt_handler_func(pcap_t *args, struct pcap_pkthdr *pCapHeader, con
     //printf("`````2```\n");
 }
 
-void* FILTER::_listen_func(void * args)
+// 流量监听线程
+void* FILTER::_cap_func(void * args)
 {
     FILTER *pf = (FILTER*)args;
     // while(1)
@@ -157,7 +169,7 @@ void* FILTER::_listen_func(void * args)
         
         std::cout<<"dev start"<<std::endl;
         
-        pcap_loop(pCapDev, -1, (pcap_handler)_pkt_handler_func, (u8*)args);
+        pcap_loop(pCapDev, -1, (pcap_handler)_pkt_handler_callback_func, (u8*)args);
         // pcap_loop(pCapDev, -1, (pcap_handler)dns_protocol_packet_callback, (u8*)args);
 
         pcap_close(pCapDev);
@@ -172,7 +184,11 @@ DEV FILTER::interface_get()
 
 int FILTER::start()
 {
-    pthread_create(&_thread_handler, NULL, _listen_func, (void*)this);
+    pthread_create(&_cap_handler, NULL, _cap_func, (void*)this);
+
+    pthread_create(&_resolve_handler, NULL, _resolve_func, (void*)this);
+
+    //pthread_create(&_sync_handler, NULL, _sync_func, (void*)this);
 
     //pthread_create(&_debug_thread)
 }
@@ -183,29 +199,31 @@ int FILTER::interface_add(DEV &dev)
     std::cout<<_dev<<std::endl;
 }
 
-int FILTER::domain_add(std::string name)
+// 添加二级域名到解析器域名匹配列表
+int FILTER::add_domain(string& name)
 {
     const char &cfirst = name.front();
-    if('*' == cfirst)
+    if('.' == cfirst)
     {
         name.erase(0,1);
-        DOMAIN domain(name);
-        _domain_list.emplace_back(domain);
+        Domain domain(name);
+        _domain_match_list.emplace_back(domain);
     }
     return 0;
 }
 
-int FILTER::subdomain_add(std::string name)
+int FILTER::add_sub_domain(string& name)
 {
-    for(DOMAIN_LIST::iterator iter = _domain_list.begin(); iter != _domain_list.end(); ++iter)
+    // 依次调用待匹配域名的匹配器（try_match）对于子域名进行添加
+    for(DOMAIN_LIST::iterator iter = _domain_match_list.begin(); iter != _domain_match_list.end(); ++iter)
     {
-        iter->test(name);
+        iter->try_match(name);
     }
 }
 
-int FILTER::domain_show()
+int FILTER::show()
 {
-    for(DOMAIN_LIST::iterator iter = _domain_list.begin(); iter != _domain_list.end(); ++iter)
+    for(DOMAIN_LIST::iterator iter = _domain_match_list.begin(); iter != _domain_match_list.end(); ++iter)
     {
         iter->show();
     }

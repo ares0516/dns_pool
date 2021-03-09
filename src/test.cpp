@@ -16,11 +16,11 @@ int main()
     FILTER fil;
     DEV dev("wlp0s20f3");
 
-    std::string str1("*.baidu.com");
-    std::string str2("*.qq.com");
+    std::string str1(".baidu.com");
+    std::string str2(".qq.com");
 
-    fil.domain_add(str1);
-    fil.domain_add(str2);
+    fil.add_domain(str1);
+    fil.add_domain(str2);
 
     fil.interface_add(dev);
     fil.start();
@@ -31,7 +31,7 @@ int main()
      while(1)
      {
         //std::cout<<"main"<<std::endl;
-        fil.domain_show();
+        fil.show();
         sleep(10);
      }
 

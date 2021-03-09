@@ -20,16 +20,20 @@
 
 
 
-typedef std::vector<DOMAIN> DOMAIN_LIST;
+typedef std::vector<Domain> DOMAIN_LIST;
 class FILTER
 {
 private:
-    DOMAIN_LIST _domain_list;
-    DEV_LIST    _devs;   //　监听端口列表
+    DOMAIN_LIST _domain_match_list;
+    //DEV_LIST    _devs; // TODO: 下一个版本加入多端口支持
     DEV         _dev;
-    pthread_t   _thread_handler;
-    static void*    _listen_func(void* args);
-    static void     _pkt_handler_func(pcap_t *pCapDev, struct pcap_pkthdr *pCapHeader, const u8 *pBuf);
+    pthread_t   _cap_handler;
+    pthread_t   _resolve_handler;
+    pthread_t   _sync_handler;
+    static void*    _sync_func(void* args);
+    static void*    _resolve_func(void* args);
+    static void*    _cap_func(void* args);
+    static void     _pkt_handler_callback_func(pcap_t *pCapDev, struct pcap_pkthdr *pCapHeader, const u8 *pBuf);
 public:
     FILTER();
     ~FILTER();
@@ -41,9 +45,9 @@ public:
     int interface_del(DEV_LIST &list);
     //int interface_get(DEV_LIST &list);
     int interface_show();
-    int domain_show();
-    int domain_add(std::string);
-    int subdomain_add(std::string);
+    int show();
+    int add_domain(string&);
+    int add_sub_domain(string&);
     int destory();
 };
 
