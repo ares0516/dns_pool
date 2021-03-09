@@ -1,0 +1,8 @@
+#监听接口
+LISTEN=eth0
+#通配域名
+DOMAINS=*.baidu.com
+#支持的通配域名上限
+MAX_DOMAINS=10
+#支持的子域名上限
+MAX_SUB_DOMAINS=100

@@ -1,0 +1,39 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+CLockUser	xLock.h	/^    inline CLockUser(xLock &lock):mlock(lock)$/;"	f	class:CLockUser
+CLockUser	xLock.h	/^class CLockUser$/;"	c
+DEV	xtypes.h	/^typedef std::string                 DEV;$/;"	t
+DEV_LIST	xtypes.h	/^typedef std::vector<DEV>    DEV_LIST;$/;"	t
+DOMAINS	xtypes.h	/^typedef std::vector<std::string>    DOMAINS;$/;"	t
+Enter	xLock.h	/^    inline Enter()$/;"	f	class:xLock
+FILTER	xFilter.cpp	/^FILTER::FILTER()$/;"	f	class:FILTER
+FILTER	xFilter.h	/^class FILTER$/;"	c
+Leave	xLock.h	/^    inline Leave()$/;"	f	class:xLock
+VALUE	xtypes.h	/^typedef std::string                 VALUE;  \/\/ IP$/;"	t
+VALUES	xtypes.h	/^typedef std::vector<VALUE>          VALUES; \/\/$/;"	t
+XLOCK	xLock.h	66;"	d
+__FILTER_H	xFilter.h	12;"	d
+__TYPES_H	xtypes.h	12;"	d
+__XDNS_H	xDns.h	12;"	d
+__XLOCK_H	xLock.h	12;"	d
+_devs	xFilter.h	/^    DEV_LIST  _devs;   \/\/　监听端口列表$/;"	m	class:FILTER
+interface_add	xFilter.cpp	/^int FILTER::interface_add(DEV &dev)$/;"	f	class:FILTER
+interface_add	xFilter.cpp	/^int FILTER::interface_add(DEV_LIST &list)$/;"	f	class:FILTER
+mLock	xLock.h	/^    xLock& mLock;$/;"	m	class:CLockUser
+mMutex	xLock.h	/^    pthread_mutex_t mMutex;$/;"	m	class:xLock
+main	test.cpp	/^int main()$/;"	f
+s16	xtypes.h	/^typedef short           s16;$/;"	t
+s32	xtypes.h	/^typedef int             s32;$/;"	t
+s8	xtypes.h	/^typedef char            s8;$/;"	t
+u16	xtypes.h	/^typedef unsigned short  u16;$/;"	t
+u32	xtypes.h	/^typedef unsigned int    u32;$/;"	t
+u8	xtypes.h	/^typedef unsigned char   u8;$/;"	t
+xLock	xLock.h	/^    inline xLock()$/;"	f	class:xLock
+xLock	xLock.h	/^class xLock$/;"	c
+~CLockUser	xLock.h	/^    inline ~CLockUser()$/;"	f	class:CLockUser
+~FILTER	xFilter.cpp	/^FILTER::~FILTER()$/;"	f	class:FILTER
+~xLock	xLock.h	/^    inline ~xLock()$/;"	f	class:xLock
